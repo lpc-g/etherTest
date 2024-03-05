@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>myFirstDapp</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div>
+      <h1>hi this is my first dapp</h1>
+      <p>here wo can set or get mood:</p>
+      <label for="mood">input mood:</label>
+      <input type="text" id="mood" />
+      <button onclick="getMood()">getMood</button>
+      <button onclick="setMood()">setMood</button>
+    </div>
+    <script>
+      let moodContract;
+      let signer;
+      const moodAddress = '0xe77DB2C3c25b6e8ae65648483B67992fEfB9DE39';
+      const moodABI = [
+        {
+          inputs: [],
+          name: 'getMood',
+          outputs: [
+            {
+              internalType: 'string',
+              name: '',
+              type: 'string',
+            },
+          ],
+          stateMutability: 'view',
+          type: 'function',
+        },
+        {
+          inputs: [
+            {
+              internalType: 'string',
+              name: '_mood',
+              type: 'string',
+            },
+          ],
+          name: 'setMood',
+          outputs: [],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ];
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+      //   const provider = new ethers.providers.Web3Provider(window.ethereum, 'goerli');
+      provider.send('eth_requestAccounts', []).then(() => {
+        provider.listAccounts().then(accounts => {
+          signer = provider.getSigner(accounts[0]);
+          moodContract = new ethers.Contract(moodAddress, moodABI, signer);
+        });
+      });
+
+      async function getMood() {
+        const mood = await moodContract.getMood();
+        console.log('mood:', mood);
+      }
+      async function setMood() {
+        const mood = document.getElementById('mood').value;
+        await moodContract.setMood(mood);
+      }
+    </script>
+  </body>
+  <style>
+    body {
+      text-align: center;
+    }
+    div {
+      width: 20%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    button {
+      width: 100%;
+      margin: 10px 0px 5px 0px;
+    }
+  </style>
+</html>
